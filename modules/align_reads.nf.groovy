@@ -1,51 +1,3 @@
-#!/usr/bin/env nextflow
-
-log.info"""\
-
-S E Q A L I G N F L O W - P I P E L I N E    
-===================================
-reference               : ${params.ref}
-reads                   : ${params.reads}
-output folder           : ${params.output}
-adapters for trimming   : ${params.adapt}
-"""
-
-include { TRIMREADS } from './modules/preprocessing_reads'
-include { ALIGNREADS; GETCOVERAGE; GETCONSENSUS } from './modules/align_reads'
-
-
-workflow {
-    reads = Channel.fromFilePairs( params.reads, checkIfExists: true )
-
-    TRIMREADS( reads ) 
-    ALIGNREADS( TRIMREADS.out )
-    GETCOVERAGE( ALIGNREADS.out )
-    GETCONSENSUS( GETCOVERAGE.out )
-}
-
-workflow.onComplete {
-    log.info "[AssembleFlow] Pipeline Complete"
-}
-
-
-process TRIMREADS {
-    publishDir "${params.outdir}/trimmed_reads/", mode: 'copy', pattern: "*_trimmed.fastq.gz"
-    tag { sample_id }
-
-    input:
-    tuple val(sample_id), path(reads)
- 
-    output:
-    tuple val(sample_id), path("*_trimmed.fastq.gz")
-
-    script:
-
-    """
-    bbduk.sh in1=${reads[0]} in2=${reads[1]} out1=${sample_id}_R1_trimmed.fastq.gz out2=${sample_id}_R2_trimmed.fastq.gz ref=${param.adapters} ktrim=r k=23 mink=4 hdist=1 minlength=50 qtrim=w trimq=20 tpe 
-
-    """
-}
-
 process ALIGN {
     publishDir "${params.outdir}/alignments/", mode: 'copy', pattern: "*.bam{.bai}"
     tag { sample_id }
@@ -104,8 +56,3 @@ process GETCONSENSUS {
 
     """
 }
-
-workflow.onComplete {
-    log.info "[SeqAlignFlow] Pipeline Complete"
-}
-
