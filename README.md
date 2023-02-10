@@ -2,8 +2,6 @@
 
 SeqAlignFlow is a pipeline that aligns reads against a reference and generates a bam file, consensus sequence and coverage plots. SeqAlignFlow is specifically developed for metagenomic sequencing datasets.
 
- and requires bbtools (https://jgi.doe.gov/data-and-tools/bbtools/)$
-
 ### Requirements
 * Linux or MacOS
 * bbtools (https://jgi.doe.gov/data-and-tools/bbtools/)
