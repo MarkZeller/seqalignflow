@@ -1,5 +1,6 @@
 process ALIGN {
-    publishDir "${params.outdir}/alignments/", mode: 'copy', pattern: "*.bam{.bai}"
+    publishDir "${params.outdir}/alignments/", mode: 'copy', pattern: "*.bam"
+    publishDir "${params.outdir}/alignments/", mode: 'copy', pattern: "*.bam.bai"
     tag { sample_id }
 
     input:
@@ -19,7 +20,7 @@ process ALIGN {
 }
 
 process GETCOVERAGE {
-    publishDir params.output, mode: 'copy', pattern: "*.png"
+    publishDir "${params.outdir}/coverage_plots/", mode: 'copy', pattern: "*.png"
     tag { sample_id }
 
     input:
@@ -31,15 +32,15 @@ process GETCOVERAGE {
     script:
 
     """
-    samtools depth -a -d 0 ${sample_id}.bam > ${sample_id}_coverage.tsv
-    python3 plot_genome_coverage.py -i ${sample_id}_coverage.tsv -d 10 -s ${sample_id} -o ${sample_id}.png 
-    python3 plot_genome_coverage.py -i ${sample_id}_coverage.tsv -d 10 -s ${sample_id} -o ${sample_id}_normalized.png -n
+    samtools depth -a -d 0 ${bam} > ${sample_id}_coverage.tsv
+    plot_genome_coverage.py -i ${sample_id}_coverage.tsv -d 10 -s ${sample_id} -o ${sample_id}.png 
+    plot_genome_coverage.py -i ${sample_id}_coverage.tsv -d 10 -s ${sample_id} -o ${sample_id}_normalized.png -n
 
     """
 }
 
 process GETCONSENSUS {
-    publishDir "${params.outdir}/consensus_sequences/", mode: 'copy', pattern: "${sample_id}*"
+    publishDir "${params.outdir}/consensus_sequences/", mode: 'copy', pattern: "${sample_id}.fa"
     tag { sample_id }
 
 
@@ -47,7 +48,7 @@ process GETCONSENSUS {
     tuple val(sample_id), path(bam)
  
     output:
-    tuple val(sample_id), path("${sample_id}*")
+    tuple val(sample_id), path("${sample_id}.fa")
 
     script:
 

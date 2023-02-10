@@ -10,16 +10,16 @@ output folder           : ${params.outdir}
 adapters for trimming   : ${params.adapt}
 """
 
-include { TRIMREADS } from './modules/trim_reads'
-include { ALIGNREADS; GETCOVERAGE; GETCONSENSUS } from './modules/align_reads'
+include { TRIM } from './modules/trim'
+include { ALIGN; GETCOVERAGE; GETCONSENSUS } from './modules/align'
 
 workflow {
     reads = Channel.fromFilePairs( params.reads, checkIfExists: true )
 
-    TRIMREADS( reads ) 
-    ALIGNREADS( TRIMREADS.out )
-    GETCOVERAGE( ALIGNREADS.out )
-    GETCONSENSUS( ALIGNREADS.out )
+    TRIM( reads ) 
+    ALIGN( TRIM.out )
+    GETCOVERAGE( ALIGN.out )
+    GETCONSENSUS( ALIGN.out )
 }
 
 workflow.onComplete {

@@ -1,4 +1,4 @@
-process TRIMREADS {
+process TRIM {
     publishDir "${params.outdir}/trimmed_reads/", mode: 'copy', pattern: "*_trimmed.fastq.gz"
     tag { sample_id }
 
@@ -11,7 +11,7 @@ process TRIMREADS {
     script:
 
     """
-    bbduk.sh in1=${reads[0]} in2=${reads[1]} out1=${sample_id}_R1_trimmed.fastq.gz out2=${sample_id}_R2_trimmed.fastq.gz ref=${param.adapters} ktrim=r k=23 mink=4 hdist=1 minlength=50 qtrim=w trimq=20 tpe 
+    bbduk.sh in1=${reads[0]} in2=${reads[1]} out1=${sample_id}_R1_trimmed.fastq.gz out2=${sample_id}_R2_trimmed.fastq.gz ref=${params.adapt} ktrim=r k=23 mink=4 hdist=1 minlength=50 qtrim=w trimq=20 tpe 
 
     """
 }
